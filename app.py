@@ -12,7 +12,7 @@ aclient = AsyncOpenAI(api_key=TOKEN)
 
 
 
-async def call_openai_api(prompt, model = "text-davinci-003", temperature = 0.1):
+async def call_openai_api(prompt, model = "gpt-3.5-turbo", temperature = 0.1):
     try:
         response = await aclient.chat.completions.create(model = model,
         messages=[{"role":"users", "content": prompt}],
