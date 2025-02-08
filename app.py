@@ -30,14 +30,22 @@ async def call_openai_api(prompt, model = "gpt-4o", temperature = 0.1):
     except Exception as e:
         return f"Errore durante la chiamata all'API: {str(e)}"
 
+@cl.on_chat_start
+def on_chat_start():
+    print("Nuova chat iniziata")
+
 # Definizione del chatbot con Chainlit
 @cl.on_message
-async def main(message):
+async def main(message: cl.Message):
+    print(cl.chat_context.to_openai())
     # Recupera il messaggio dell'utente
     user_message = message.content
-
     # Chiamata all'API di OpenAI
     response = await call_openai_api(user_message)
 
-    # Invia la risposta al frontend di Chainlit
+    # Invia la ris posta al frontend di Chainlit
     await cl.Message(content=response).send()
+
+
+
+
