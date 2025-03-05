@@ -2,8 +2,10 @@ import chainlit as cl
 import yaml 
 from ollama import chat
 from ollama import ChatResponse
-
 from openai import AsyncOpenAI
+from workflow.agent import chat_with_agent
+from langchain.schema import SystemMessage, AIMessage, HumanMessage
+
 
 with open('psw/token.yml', 'r') as f:
     token_file = yaml.safe_load(f)
@@ -14,37 +16,6 @@ aclient = AsyncOpenAI(api_key=TOKEN)
 
 
 
-
-async def call_model(prompt, model, temperature = 0.1):
-    try:
-        if model == "gpt-4o":
-            message_history = []
-            # aggiungi il nuovo messaggio dell'utente alla cronologia
-            message_history.append({"role":"user", "content":prompt})
-
-            # chiamata API
-            response = await aclient.chat.completions.create(model = model,
-            messages=message_history,
-            temperature=temperature)
-            content = response.choices[0].message.content
-
-            # aggiungi la risposta del modello alla cronologia
-            message_history.append({"role":"assistant", "content":content})
-
-            return content
-        else:
-            message_history = []
-            message_history.append({"role":"user", "content":prompt})
-            response: ChatResponse = chat(model='deepseek-r1', messages= message_history)
-            
-            #content = response.message.content
-            content = response["message"]["content"] 
-            message_history.append({"role":"assistant", "content":content})
-            return content 
-
-
-    except Exception as e:
-        return f"Errore durante la chiamata all'API: {str(e)}"
 
 @cl.set_chat_profiles
 async def chat_profile():
@@ -75,6 +46,9 @@ async def on_chat_start():
         content=f"starting chat using the {chat_profile} chat profile"
     ).send()
 
+
+
+
 # Definizione del chatbot con Chainlit
 @cl.on_message
 async def main(message: cl.Message):
@@ -82,11 +56,16 @@ async def main(message: cl.Message):
     # Recupera il messaggio dell'utente
     user_message = message.content
     
+    response = chat_with_agent(user_messages=user_message)
+    #state['messages'].append(HumanMessage(content=user_message))
+
+    #chat_state = agent.invoke(chat_state)
+    
     #recupera il modello della sessione
-    model = cl.user_session.get('model','gpt-4o')
+    #model = cl.user_session.get('model','gpt-4o')
 
     # Chiamata all'API di OpenAI
-    response = await call_model(user_message, model)
+    #response = chat_state['messages'][-1]
 
     # Invia la ris posta al frontend di Chainlit
     await cl.Message(content=response).send()
