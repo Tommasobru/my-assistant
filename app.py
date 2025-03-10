@@ -57,15 +57,7 @@ async def main(message: cl.Message):
     user_message = message.content
     
     response = chat_with_agent(user_messages=user_message)
-    #state['messages'].append(HumanMessage(content=user_message))
 
-    #chat_state = agent.invoke(chat_state)
-    
-    #recupera il modello della sessione
-    #model = cl.user_session.get('model','gpt-4o')
-
-    # Chiamata all'API di OpenAI
-    #response = chat_state['messages'][-1]
 
     # Invia la ris posta al frontend di Chainlit
     await cl.Message(content=response).send()

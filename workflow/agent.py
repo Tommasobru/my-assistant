@@ -24,10 +24,6 @@ system_messages = "Sono il tuo assistente personale"
 state : ChatState = {"messages" : []}
 state['messages'].append(SystemMessage(content = system_messages))
 
-    #def user_input(state: ChatState):
-    #    user_messages = input("Tu: ")
-    #    state['messages'].append(HumanMessage(content=user_messages))
-    #    return state
 
 def generate_response(state: ChatState):
     response = llm.invoke(state['messages'][-1].content)
@@ -47,11 +43,7 @@ workflow.add_edge('generate response', END)
 agent  = workflow.compile()
 
 
-#agent, chat_state = build_graph()
-#while True:
-#    chat_state = agent.invoke(chat_state)  # Invoca il grafo passando SOLO lo stato
-#    response = chat_state["messages"][-1].content  # Prende l'ultima risposta
-#    print(f"🤖 ChatGPT: {response}")
+
 
 def chat_with_agent(user_messages):
     #state = ChatState['messages'].append(AIMessage(content=user_messages))
