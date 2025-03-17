@@ -1,9 +1,11 @@
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, START, END
 from langchain.schema import SystemMessage, AIMessage, HumanMessage
+from langchain.tools import Tool
 from typing import TypedDict, Annotated 
 import yaml
 import os
+from tools import web_search_tool
 
 with open('psw/token.yml', 'r') as f:
     token_file = yaml.safe_load(f)
@@ -15,14 +17,22 @@ os.environ["OPENAI_API_KEY"] = TOKEN
 
 llm = ChatOpenAI(model = "gpt-4o", temperature=0.7)
 
+
 # Annotaded serve per aggiungere metadati ad un tipo, questa annotazione non cambia il tipo effettivo ma fornisce informazioni extra 
 class ChatState(TypedDict):
     messages: Annotated[list[AIMessage | HumanMessage | SystemMessage], "add"]
 
 system_messages = "Sono il tuo assistente personale"
 
+
 state : ChatState = {"messages" : []}
 state['messages'].append(SystemMessage(content = system_messages))
+
+search_tool = Tool(
+    name="Web Search",
+    func=web_search_tool(state['messages'][-1].content),
+    description="Use this tool to search the web for real-time information."
+)
 
 
 def generate_response(state: ChatState):

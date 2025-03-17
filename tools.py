@@ -11,3 +11,6 @@ os.environ["OPENAI_API_KEY"] = TOKEN
 
 tavily_tool = TavilySearchResults(max_results=5)
 
+def web_search_tool(query:str) -> str:
+    return tavily_tool.invoke(query)
+
